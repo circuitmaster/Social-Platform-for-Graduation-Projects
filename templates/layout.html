@@ -4,18 +4,18 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>Graduation Projects - {% block title %}{% endblock %}</title>
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.min.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css"/>
     <link rel="stylesheet"
           href="{{ url_for('static', filename='main.css') }}"/>
   </head>
   <body>
     <header>
-      <nav class="navbar" aria-label="main navigation">
+      <nav class="navbar has-shadow is-info">
         <div class="navbar-brand">
-          <span class="navbar-item">
-            <a class="button is-link" href="{{ url_for('home_page') }}">Home</a>
-          </span>
+          <a class="navbar-item" href="{{ url_for('home_page') }}">
+            <img src="{{ url_for('static', filename='book.png') }}" alt="site logo" style="max-height: 50px" class="py-2 px-2">
+          </a>
+          <a class="navbar-item" href="{{ url_for('about_page') }}">About</a>
         </div>
       </nav>
     </header>
@@ -30,7 +30,7 @@
 
     <footer class="footer">
       <div class="content">
-        <small>&copy; 2020, Ali Emre</small>
+        <small>&copy; 2020 Ali Emre Öztaş</small>
       </div>
     </footer>
   </body>
