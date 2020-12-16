@@ -23,10 +23,10 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <form method ="post" action="/">
-                <button class="button is-primary" name="signup" id="signup"><strong>Sign up</strong></button>
-                <button class="button is-light" name="login" id="login">Log in</button>
-              </form> 
+              
+              <button class="button is-primary" id="signup"><strong>Sign up</strong></button>
+              <button class="button is-light" id="login">Log in</button>
+          
               <!--<a class="button is-primary">
                 <strong>Sign up</strong>
               </a> 
@@ -48,9 +48,9 @@
     </main>
 
     <!-- login screen -->
-    <!--
-    <div class="modal">
-      <div class="modal-background"></div>
+    
+    <div class="modal" id="logmod">
+      <div class="modal-background" id="mbg2"></div>
         <div class="modal-content has-background-white py-5 px-5">
           <h3 class="title mb-6">Log In</h3>
           <form>
@@ -79,11 +79,11 @@
             </div>
           </form>
         </div>
-    </div>-->
+    </div>
 
     <!-- register screen -->
-    <div class="modal">
-      <div class="modal-background"></div>
+    <div class="modal" id="regmod">
+      <div class="modal-background" id="mbg"></div>
         <div class="modal-content has-background-white py-5 px-5">
           <h3 class="title mb-6">Register</h3>
           <div class="field">
