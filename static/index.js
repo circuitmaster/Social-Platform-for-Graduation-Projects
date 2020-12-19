@@ -5,12 +5,17 @@ const modalBg = document.querySelector('#mbg');
 const modalBg2 = document.querySelector('#mbg2');
 const modal = document.querySelector('#regmod');
 const modal2 = document.querySelector('#logmod');
+const cancel = document.querySelector('#cancel');
 
 signupButton.addEventListener('click', () => {
 	modal.classList.add('is-active');
 })
 
 modalBg.addEventListener('click', () => {
+	modal.classList.remove('is-active');
+})
+
+cancel.addEventListener('click', () => {
 	modal.classList.remove('is-active');
 })
 
