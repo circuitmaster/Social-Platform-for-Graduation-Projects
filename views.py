@@ -1,5 +1,4 @@
 from flask import render_template, request, redirect, url_for
-#from flask_mysqldb import MySQL
 import pymysql
 
 registering = False
@@ -40,13 +39,12 @@ def validate_login_register(form, loginFlag):
 	global logging
 	global registering
 	if loginFlag == 1:
-		#server.check_user()
 		valid = True
-		email = request.form.get("email")
+		user = request.form.get("username")
 		password = request.form.get("password")
-		if email == "" or "@itu.edu.tr" not in email:
+		if user == "":
 			valid = False
-			errordict['loginmail'] = "e-mail is not valid"
+			errordict['loginuser'] = "username is not valid"
 		if password == "":
 			valid = False 
 			errordict['loginpassword'] = "password is not valid"
@@ -57,10 +55,10 @@ def validate_login_register(form, loginFlag):
 			try:
 
 				with con.cursor() as cur:
-					cur.execute("SELECT PASSWORD FROM USER_TABLE WHERE EMAIL = " + "'" + email + "'")
+					cur.execute("SELECT PASSWORD FROM USER_TABLE WHERE USERNAME = " + "'" + user + "'")
 					result = cur.fetchone()
 					if not result:
-						errordict['loginmail'] = "there is no registeration with that e-mail"
+						errordict['loginuser'] = "there is no registeration with that username"
 						return render_template("home.html",  registering=registering, logging=True, errordict=errordict)
 
 					passwd = result[0]; 
@@ -82,9 +80,13 @@ def validate_login_register(form, loginFlag):
 		email = request.form.get("email")
 		password = request.form.get("password")
 		name = request.form.get("name")
+		surname = request.form.get("surname")
 		if name == "":
 			valid = False
 			errordict['regname'] = "name is not valid"
+		if surname == "":
+			valid = False
+			errordict['regsurname'] = "surname is not valid"
 		if email == "" or email == "example@itu.edu.tr" or "@itu.edu.tr" not in email:
 			valid = False
 			errordict['regmail'] = "e-mail is not valid"
@@ -97,6 +99,23 @@ def validate_login_register(form, loginFlag):
 		if not valid:
 			return render_template("home.html",  registering=True, logging=logging, errordict=errordict)
 		else:
+			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+
+			try:
+				with con.cursor() as cur:
+					cur.execute("SELECT * FROM USER_TABLE WHERE USERNAME=" + "'" + username + "'")
+					result = cur.fetchone()
+					if result:
+						errordict['regusername'] = "this username already exists, choose another"
+						return render_template("home.html",  registering=True, logging=False, errordict=errordict)
+					sql = "INSERT INTO USER_TABLE(ID, USERNAME, PASSWORD, NAME, SURNAME, EMAIL, PHOTO, ROLE, DEPARTMENTID) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', NULL, 'student', 1)" % (username, password, name, surname, email)
+					cur.execute(sql)
+					con.commit()
+			except:
+				con.rollback()
+			finally:
+				con.close();
+			print("registration successfull")
 			return render_template("home.html",  registering=False, logging=False, errordict={})
 
 

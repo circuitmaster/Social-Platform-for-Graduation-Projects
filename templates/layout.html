@@ -43,11 +43,11 @@
           <h3 class="title mb-6">Log In</h3>
           <form method="post">
             <div class="field">
-              <label class="label">E Mail</label>
+              <label class="label">Username</label>
               <div class="control">
-                <input type="text" name="email" class="input {% if errordict['loginmail'] %} is-danger {% endif %}" placeholder="example@itu.edu.tr">
-                {% if errordict['loginmail'] %}
-                <p class="help is-danger">{{ errordict['loginmail'] }}</p>
+                <input type="text" name="username" class="input {% if errordict['loginuser'] %} is-danger {% endif %}" placeholder="example@itu.edu.tr">
+                {% if errordict['loginuser'] %}
+                <p class="help is-danger">{{ errordict['loginuser'] }}</p>
                 {% endif %}
               </div>
             </div>
@@ -82,11 +82,21 @@
           <h3 class="title mb-6">Register</h3>
           <form method="post">
             <div class="field">
-              <label class="label">Full Name</label>
+              <label class="label">Name</label>
               <div class="control">
                 <input class="input {% if errordict['regname'] %} is-danger {% endif %}" name="name" type="text" placeholder="John">
                 {% if errordict['regname'] %}
                 <p class="help is-danger">{{ errordict['regname'] }}</p>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="label">Surname</label>
+              <div class="control">
+                <input class="input {% if errordict['regsurname'] %} is-danger {% endif %}" name="surname" type="text" placeholder="Hopper">
+                {% if errordict['regsurname'] %}
+                <p class="help is-danger">{{ errordict['regsurname'] }}</p>
                 {% endif %}
               </div>
             </div>
