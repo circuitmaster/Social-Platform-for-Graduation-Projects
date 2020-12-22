@@ -45,7 +45,7 @@
             <div class="field">
               <label class="label">Username</label>
               <div class="control">
-                <input type="text" name="username" class="input {% if errordict['loginuser'] %} is-danger {% endif %}" placeholder="example@itu.edu.tr">
+                <input type="text" name="username" class="input {% if errordict['loginuser'] %} is-danger {% endif %}" placeholder="j123">
                 {% if errordict['loginuser'] %}
                 <p class="help is-danger">{{ errordict['loginuser'] }}</p>
                 {% endif %}
@@ -140,11 +140,11 @@
             <div class="field">
               <div class="control">
                 <label class="radio">
-                  <input type="radio" name="question">
+                  <input type="radio" name="question" value="student">
                   Student
                 </label>
                 <label class="radio">
-                  <input type="radio" name="question">
+                  <input type="radio" name="question" value="professor">
                   Professor
                 </label>
               </div>
@@ -154,10 +154,11 @@
               <label class="label">Department</label>
               <div class="control">
                 <div class="select">
-                  <select>
+                  <select name="department">
                     <option>Choose</option>
-                    <option>Department1</option>
-                    <option>Department2</option>
+                    {% for name in departments %}
+                      <option>{{name}}</option>
+                    {% endfor %}
                   </select>
                 </div>
               </div>

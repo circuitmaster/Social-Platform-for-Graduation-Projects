@@ -11,9 +11,3 @@ app.add_url_rule("/about", methods = ['GET', 'POST'], view_func=views.about_page
 if __name__ == "__main__":
     port = app.config.get("PORT")
     app.run(host="localhost", port=port)
-
-
-def check_user():
-	cur = mysql.connection.cursor()
-	resultValue = cur.execute("SELECT * FROM USER_TABLE")
-	print(resultValue)

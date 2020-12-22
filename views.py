@@ -10,6 +10,14 @@ def home_page():
 	global logging
 	logging = False
 	registering = False
+	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	try:
+		with con.cursor() as cur:
+			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE")
+			result = cur.fetchone()
+			print(result, type(result))
+	finally:
+		con.close()
 	if request.method == 'POST': 
 		if 'register' in request.form:
 			return validate_login_register(request.form,0)
@@ -17,7 +25,7 @@ def home_page():
 			return validate_login_register(request.form,1)
 
 	
-	return render_template("home.html", registering=False, logging=False, errordict={})
+	return render_template("home.html", registering=False, logging=False, errordict={}, departments=result)
 	
 
 def about_page():
@@ -25,13 +33,21 @@ def about_page():
 	global logging
 	logging = False
 	registering = False
+	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	try:
+		with con.cursor() as cur:
+			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE")
+			result = cur.fetchone()
+			print(result, type(result))
+	finally:
+		con.close()
 	if request.method == 'POST': 
 		if 'register' in request.form:
 			return validate_login_register(request.form,0)
 		elif 'login' in request.form:
 			return validate_login_register(request.form,1)
 
-	return render_template("about.html",  registering=False, logging=False, errordict={})
+	return render_template("about.html",  registering=False, logging=False, errordict={}, departments=result)
 
 
 def validate_login_register(form, loginFlag):
@@ -76,6 +92,8 @@ def validate_login_register(form, loginFlag):
 			return render_template("home.html",  registering=False, logging=False, errordict={})
 	else:
 		valid = True
+		role = request.form['question']
+		department = request.form['department']
 		username = request.form.get("username")
 		email = request.form.get("email")
 		password = request.form.get("password")
@@ -87,7 +105,7 @@ def validate_login_register(form, loginFlag):
 		if surname == "":
 			valid = False
 			errordict['regsurname'] = "surname is not valid"
-		if email == "" or email == "example@itu.edu.tr" or "@itu.edu.tr" not in email:
+		if email == "" or "@itu.edu.tr" not in email:
 			valid = False
 			errordict['regmail'] = "e-mail is not valid"
 		if password == "":
@@ -108,7 +126,10 @@ def validate_login_register(form, loginFlag):
 					if result:
 						errordict['regusername'] = "this username already exists, choose another"
 						return render_template("home.html",  registering=True, logging=False, errordict=errordict)
-					sql = "INSERT INTO USER_TABLE(ID, USERNAME, PASSWORD, NAME, SURNAME, EMAIL, PHOTO, ROLE, DEPARTMENTID) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', NULL, 'student', 1)" % (username, password, name, surname, email)
+					sql1 = "SELECT ID FROM DEPARTMENT_TABLE WHERE NAME=" + "'" + department + "'"
+					cur.execute(sql1)
+					result = cur.fetchone()
+					sql = "INSERT INTO USER_TABLE(ID, USERNAME, PASSWORD, NAME, SURNAME, EMAIL, PHOTO, ROLE, DEPARTMENTID) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%d')" % (username, password, name, surname, email, role, result[0])
 					cur.execute(sql)
 					con.commit()
 			except:
