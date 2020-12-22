@@ -1,11 +1,12 @@
 from flask import render_template, request, redirect, url_for
+#from flask_mysqldb import MySQL
+import pymysql
 
 registering = False
 logging = False
 errordict = {}
 
 def home_page():
-	print("home_page is rendered")
 	global registering
 	global logging
 	logging = False
@@ -39,22 +40,42 @@ def validate_login_register(form, loginFlag):
 	global logging
 	global registering
 	if loginFlag == 1:
+		#server.check_user()
+		valid = True
 		email = request.form.get("email")
 		password = request.form.get("password")
-		if email!="" and password!="" and email!="example@itu.edu.tr" and password!="******":
-			logging = False
-			print("dolduruldu")
-			return render_template("home.html",  registering=False, logging=False, errordict={})
+		if email == "" or "@itu.edu.tr" not in email:
+			valid = False
+			errordict['loginmail'] = "e-mail is not valid"
+		if password == "":
+			valid = False 
+			errordict['loginpassword'] = "password is not valid"
+		if not valid:
+			return render_template("home.html",  registering=registering, logging=True, errordict=errordict)
 		else:
-			if email == "" or email == "example@itu.edu.tr" or "@itu.edu.tr" not in email:
-				errordict['mail'] = "e-mail is not valid"
-			if password == "":
-				errordict['password'] = "password is not valid"
-			logging = True	
-			print("boş")
-			#return redirect(home_page)
-			return render_template("home.html",  registering=registering, logging=logging, errordict=errordict)
-		print("logging in")
+			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+			try:
+
+				with con.cursor() as cur:
+					cur.execute("SELECT PASSWORD FROM USER_TABLE WHERE EMAIL = " + "'" + email + "'")
+					result = cur.fetchone()
+					if not result:
+						errordict['loginmail'] = "there is no registeration with that e-mail"
+						return render_template("home.html",  registering=registering, logging=True, errordict=errordict)
+
+					passwd = result[0]; 
+					
+					if passwd == password:
+						print("login successfull")
+					else:
+						errordict['loginpassword'] = "wrong password"
+						return render_template("home.html",  registering=registering, logging=True, errordict=errordict)
+
+			finally:
+			    con.close()
+
+			logging = False
+			return render_template("home.html",  registering=False, logging=False, errordict={})
 	else:
 		valid = True
 		username = request.form.get("username")
@@ -63,22 +84,20 @@ def validate_login_register(form, loginFlag):
 		name = request.form.get("name")
 		if name == "":
 			valid = False
-			errordict['name'] = "name is not valid"
+			errordict['regname'] = "name is not valid"
 		if email == "" or email == "example@itu.edu.tr" or "@itu.edu.tr" not in email:
 			valid = False
-			errordict['mail'] = "e-mail is not valid"
+			errordict['regmail'] = "e-mail is not valid"
 		if password == "":
 			valid = False
-			errordict['password'] = "password is not valid"
+			errordict['regpassword'] = "password is not valid"
 		if username == "":
 			valid = False
-			errordict['username'] = "username is not valid"
+			errordict['regusername'] = "username is not valid"
 		if not valid:
-			registering = True
-			return render_template("home.html",  registering=registering, logging=logging, errordict=errordict)
+			return render_template("home.html",  registering=True, logging=logging, errordict=errordict)
 		else:
 			return render_template("home.html",  registering=False, logging=False, errordict={})
-		print("registering")
 
 
 

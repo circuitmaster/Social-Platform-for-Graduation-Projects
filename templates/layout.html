@@ -45,18 +45,18 @@
             <div class="field">
               <label class="label">E Mail</label>
               <div class="control">
-                <input type="text" name="email" class="input {% if errordict['mail'] %} is-danger {% endif %}" placeholder="example@itu.edu.tr">
-                {% if errordict['mail'] %}
-                <p class="help is-danger">{{ errordict['mail'] }}</p>
+                <input type="text" name="email" class="input {% if errordict['loginmail'] %} is-danger {% endif %}" placeholder="example@itu.edu.tr">
+                {% if errordict['loginmail'] %}
+                <p class="help is-danger">{{ errordict['loginmail'] }}</p>
                 {% endif %}
               </div>
             </div>
             <div class="field">
               <label class="label">Password</label>
               <div class="control">
-                <input type="password" name="password" class="input {% if errordict['password'] %} is-danger {% endif %}" placeholder="******">
-                {% if errordict['password'] %}
-                <p class="help is-danger">{{ errordict['password'] }}</p>
+                <input type="password" name="password" class="input {% if errordict['loginpassword'] %} is-danger {% endif %}" placeholder="******">
+                {% if errordict['loginpassword'] %}
+                <p class="help is-danger">{{ errordict['loginpassword'] }}</p>
                 {% endif %}
               </div>
             </div>
@@ -84,9 +84,9 @@
             <div class="field">
               <label class="label">Full Name</label>
               <div class="control">
-                <input class="input {% if errordict['name'] %} is-danger {% endif %}" name="name" type="text" placeholder="John">
-                {% if errordict['name'] %}
-                <p class="help is-danger">{{ errordict['name'] }}</p>
+                <input class="input {% if errordict['regname'] %} is-danger {% endif %}" name="name" type="text" placeholder="John">
+                {% if errordict['regname'] %}
+                <p class="help is-danger">{{ errordict['regname'] }}</p>
                 {% endif %}
               </div>
             </div>
@@ -94,22 +94,22 @@
             <div class="field">
               <label class="label">Username</label>
               <div class="control has-icons-right">
-                <input class="input {% if errordict['username'] %} is-danger {% endif %}" name="username" type="text" placeholder="j123" value="">
+                <input class="input {% if errordict['regusername'] %} is-danger {% endif %}" name="username" type="text" placeholder="j123" value="">
                 <span class="icon is-small is-right">
                   <i class="fas fa-check"></i>
                 </span>
               </div>
-              {% if errordict['username'] %}
-                <p class="help is-danger">{{ errordict['username'] }}</p>
+              {% if errordict['regusername'] %}
+                <p class="help is-danger">{{ errordict['regusername'] }}</p>
                 {% endif %}
             </div>
 
             <div class="field">
               <label class="label">Password</label>
               <div class="control">
-                <input class="input {% if errordict['password'] %} is-danger {% endif %}" type="password" name="password" placeholder="********">
-                {% if errordict['password'] %}
-                <p class="help is-danger">{{ errordict['password'] }}</p>
+                <input class="input {% if errordict['regpassword'] %} is-danger {% endif %}" type="password" name="password" placeholder="********">
+                {% if errordict['regpassword'] %}
+                <p class="help is-danger">{{ errordict['regpassword'] }}</p>
                 {% endif %}
               </div>
             </div>
@@ -117,13 +117,13 @@
             <div class="field">
               <label class="label">Email</label>
               <div class="control has-icons-right">
-                <input class="input {% if errordict['mail'] %} is-danger {% endif %}" type="email" name="email" placeholder="example@itu.edu.tr" value="">
+                <input class="input {% if errordict['regmail'] %} is-danger {% endif %}" type="email" name="email" placeholder="example@itu.edu.tr" value="">
                 <span class="icon is-small is-right">
                   <i class="fas fa-exclamation-triangle"></i>
                 </span>
               </div>
-              {% if errordict['mail'] %}
-                <p class="help is-danger">{{ errordict['mail'] }}</p>
+              {% if errordict['regmail'] %}
+                <p class="help is-danger">{{ errordict['regmail'] }}</p>
               {% endif %}
             </div>
 
