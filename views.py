@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, redirect, url_for, session
 import pymysql
 
 registering = False
@@ -71,13 +71,14 @@ def validate_login_register(form, loginFlag):
 			try:
 
 				with con.cursor() as cur:
-					cur.execute("SELECT PASSWORD FROM USER_TABLE WHERE USERNAME = " + "'" + user + "'")
+					cur.execute("SELECT PASSWORD, ROLE FROM USER_TABLE WHERE USERNAME = " + "'" + user + "'")
 					result = cur.fetchone()
 					if not result:
 						errordict['loginuser'] = "there is no registeration with that username"
 						return render_template("home.html",  registering=registering, logging=True, errordict=errordict)
 
-					passwd = result[0]; 
+					passwd = result[0];
+					role = result[1];
 					
 					if passwd == password:
 						print("login successfull")
@@ -89,6 +90,8 @@ def validate_login_register(form, loginFlag):
 			    con.close()
 
 			logging = False
+			session["user"] = user
+			session["role"] = role
 			return render_template("home.html",  registering=False, logging=False, errordict={})
 	else:
 		valid = True
@@ -138,6 +141,16 @@ def validate_login_register(form, loginFlag):
 				con.close();
 			print("registration successfull")
 			return render_template("home.html",  registering=False, logging=False, errordict={})
+
+def user_page():
+	return render_template("user.html", errordict={})
+
+def add_project():
+	return render_template("add_project.html", errordict={})
+
+def logout():
+	session.pop("user", None)
+	return redirect(url_for('home_page'))
 
 
 

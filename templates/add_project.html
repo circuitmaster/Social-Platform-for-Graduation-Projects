@@ -1,0 +1,119 @@
+{% extends "layout.html" %}
+{% block title %}Add Project{% endblock %}
+{% block content %}
+	<div class="search">
+	   <section class="hero">
+	      <div class="hero-body">
+	        <div class="container has-text-centered">
+	          <h3 class="title mb-6">Add New Project</h3>
+	          <form method="post">
+	            <div class="field">
+	              <label class="label">Project Name</label>
+	              <div class="control">
+	                <input class="input {% if errordict['regname'] %} is-danger {% endif %}" name="name" type="text" placeholder="">
+	                {% if errordict['regname'] %}
+	                <p class="help is-danger">{{ errordict['regname'] }}</p>
+	                {% endif %}
+	              </div>
+	            </div>
+
+	            <div class="field">
+	              <label class="label">Surname</label>
+	              <div class="control">
+	                <input class="input {% if errordict['regsurname'] %} is-danger {% endif %}" name="surname" type="text" placeholder="Hopper">
+	                {% if errordict['regsurname'] %}
+	                <p class="help is-danger">{{ errordict['regsurname'] }}</p>
+	                {% endif %}
+	              </div>
+	            </div>
+
+	            <div class="field">
+	              <label class="label">Start Date</label>
+	              <div class="control has-icons-right">
+	                <input class="input {% if errordict['regusername'] %} is-danger {% endif %}" name="username" type="date"  value="2018-07-22">
+	                <span class="icon is-small is-right">
+	                  <i class="fas fa-check"></i>
+	                </span>
+	              </div>
+	              {% if errordict['regusername'] %}
+	                <p class="help is-danger">{{ errordict['regusername'] }}</p>
+	                {% endif %}
+	            </div>
+
+	            <div class="field">
+	              <label class="label">End Date</label>
+	              <div class="control has-icons-right">
+	                <input class="input {% if errordict['regusername'] %} is-danger {% endif %}" name="username" type="date"  value="2018-07-22">
+	                <span class="icon is-small is-right">
+	                  <i class="fas fa-check"></i>
+	                </span>
+	              </div>
+	              {% if errordict['regusername'] %}
+	                <p class="help is-danger">{{ errordict['regusername'] }}</p>
+	                {% endif %}
+	            </div>
+
+	            <div class="field">
+	              <label class="label">Password</label>
+	              <div class="control">
+	                <input class="input {% if errordict['regpassword'] %} is-danger {% endif %}" type="password" name="password" placeholder="********">
+	                {% if errordict['regpassword'] %}
+	                <p class="help is-danger">{{ errordict['regpassword'] }}</p>
+	                {% endif %}
+	              </div>
+	            </div>
+
+	            <div class="field">
+	              <label class="label">Email</label>
+	              <div class="control has-icons-right">
+	                <input class="input {% if errordict['regmail'] %} is-danger {% endif %}" type="email" name="email" placeholder="example@itu.edu.tr" value="">
+	                <span class="icon is-small is-right">
+	                  <i class="fas fa-exclamation-triangle"></i>
+	                </span>
+	              </div>
+	              {% if errordict['regmail'] %}
+	                <p class="help is-danger">{{ errordict['regmail'] }}</p>
+	              {% endif %}
+	            </div>
+
+	            <div class="field">
+	              <div class="control">
+	                <label class="radio">
+	                  <input type="radio" name="question" value="student">
+	                  Student
+	                </label>
+	                <label class="radio">
+	                  <input type="radio" name="question" value="professor">
+	                  Professor
+	                </label>
+	              </div>
+	            </div>
+
+	            <div class="field">
+	              <label class="label">Department</label>
+	              <div class="control">
+	                <div class="select">
+	                  <select name="department">
+	                    <option>Choose</option>
+	                    {% for name in departments %}
+	                      <option>{{name}}</option>
+	                    {% endfor %}
+	                  </select>
+	                </div>
+	              </div>
+	            </div>
+
+	            <div class="field is-grouped">
+	              <div class="control">
+	                <button type="submit" name="register" class="button is-link">Register</button>
+	              </div>
+	              <div class="control">
+	                <button id="cancel" class="button is-link is-light">Cancel</button>
+	              </div>
+	            </div>
+	          </form>
+	        </div>
+	      </div>
+	    </section>
+    </div>
+{% endblock %}
