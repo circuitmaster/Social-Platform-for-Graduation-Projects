@@ -31,7 +31,7 @@
             <div class="buttons {% if 'user' not in session %} is-hidden {% endif %}">
               <a class="button is-primary {% if 'user' not in session %} is-hidden {% endif %}" href="{{ url_for('user_page') }}">User</a>
               <a class="button is-primary {% if 'user' not in session or session['role'] == 'student' %} is-hidden {% endif %}" href="{{ url_for('add_project') }}">Add Project</a>
-              <a class="button is-primary {% if 'user' not in session %} is-hidden {% endif %}" href="{{ url_for('logout') }}">Logout</a>
+              <a class="button is-light {% if 'user' not in session %} is-hidden {% endif %}" href="{{ url_for('logout') }}">Logout</a>
             </div>
           </div>
         </div>
@@ -204,7 +204,7 @@
 
             <footer class="footer">
               <div class="content">
-                <small>&copy; 2020 Ali Emre Öztaş</small>
+                <small>&copy; 2021 Ali Emre Öztaş</small>
               </div>
             </footer>
         </div>

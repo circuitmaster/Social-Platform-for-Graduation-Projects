@@ -6,23 +6,23 @@
 	      <div class="hero-body">
 	        <div class="container has-text-centered">
 	          <h3 class="title mb-6">Add New Project</h3>
-	          <form method="post">
+	          <form method="post" enctype="multipart/form-data">
 	            <div class="field">
-	              <label class="label">Project Name</label>
+	              <label class="label">Project Title</label>
 	              <div class="control">
-	                <input class="input {% if errordict['regname'] %} is-danger {% endif %}" name="name" type="text" placeholder="">
-	                {% if errordict['regname'] %}
-	                <p class="help is-danger">{{ errordict['regname'] }}</p>
+	                <input class="input {% if errordict['title'] %} is-danger {% endif %}" name="title" type="text" placeholder="">
+	                {% if errordict['title'] %}
+	                <p class="help is-danger">{{ errordict['title'] }}</p>
 	                {% endif %}
 	              </div>
 	            </div>
 
 	            <div class="field">
-	              <label class="label">Surname</label>
+	              <label class="label">Subject</label>
 	              <div class="control">
-	                <input class="input {% if errordict['regsurname'] %} is-danger {% endif %}" name="surname" type="text" placeholder="Hopper">
-	                {% if errordict['regsurname'] %}
-	                <p class="help is-danger">{{ errordict['regsurname'] }}</p>
+	                <input class="input {% if errordict['subject'] %} is-danger {% endif %}" name="subject" type="text">
+	                {% if errordict['subject'] %}
+	                <p class="help is-danger">{{ errordict['subject'] }}</p>
 	                {% endif %}
 	              </div>
 	            </div>
@@ -30,63 +30,76 @@
 	            <div class="field">
 	              <label class="label">Start Date</label>
 	              <div class="control has-icons-right">
-	                <input class="input {% if errordict['regusername'] %} is-danger {% endif %}" name="username" type="date"  value="2018-07-22">
+	                <input class="input {% if errordict['date'] %} is-danger {% endif %}" name="date1" type="date"  value="2021-01-01">
 	                <span class="icon is-small is-right">
 	                  <i class="fas fa-check"></i>
 	                </span>
 	              </div>
-	              {% if errordict['regusername'] %}
-	                <p class="help is-danger">{{ errordict['regusername'] }}</p>
+	              {% if errordict['date'] %}
+	                <p class="help is-danger">{{ errordict['date'] }}</p>
 	                {% endif %}
 	            </div>
 
 	            <div class="field">
 	              <label class="label">End Date</label>
 	              <div class="control has-icons-right">
-	                <input class="input {% if errordict['regusername'] %} is-danger {% endif %}" name="username" type="date"  value="2018-07-22">
+	                <input class="input {% if errordict['date'] %} is-danger {% endif %}" name="date2" type="date"  value="2022-01-01">
 	                <span class="icon is-small is-right">
 	                  <i class="fas fa-check"></i>
 	                </span>
 	              </div>
-	              {% if errordict['regusername'] %}
-	                <p class="help is-danger">{{ errordict['regusername'] }}</p>
+	              {% if errordict['date'] %}
+	                <p class="help is-danger">{{ errordict['date'] }}</p>
 	                {% endif %}
 	            </div>
 
 	            <div class="field">
-	              <label class="label">Password</label>
+	              <label class="label">Photo</label>
 	              <div class="control">
-	                <input class="input {% if errordict['regpassword'] %} is-danger {% endif %}" type="password" name="password" placeholder="********">
-	                {% if errordict['regpassword'] %}
-	                <p class="help is-danger">{{ errordict['regpassword'] }}</p>
+	                <input class="input {% if errordict['photo'] %} is-danger {% endif %}" type="file" name="img" accept="image/*">
+	                {% if errordict['photo'] %}
+	                <p class="help is-danger">{{ errordict['photo'] }}</p>
 	                {% endif %}
 	              </div>
 	            </div>
 
 	            <div class="field">
-	              <label class="label">Email</label>
+	              <label class="label">Summary</label>
 	              <div class="control has-icons-right">
-	                <input class="input {% if errordict['regmail'] %} is-danger {% endif %}" type="email" name="email" placeholder="example@itu.edu.tr" value="">
+	                <input class="input {% if errordict['summary'] %} is-danger {% endif %}" type="text" name="summary" value="">
 	                <span class="icon is-small is-right">
 	                  <i class="fas fa-exclamation-triangle"></i>
 	                </span>
 	              </div>
-	              {% if errordict['regmail'] %}
-	                <p class="help is-danger">{{ errordict['regmail'] }}</p>
+	              {% if errordict['summary'] %}
+	                <p class="help is-danger">{{ errordict['summary'] }}</p>
 	              {% endif %}
 	            </div>
 
 	            <div class="field">
-	              <div class="control">
-	                <label class="radio">
-	                  <input type="radio" name="question" value="student">
-	                  Student
-	                </label>
-	                <label class="radio">
-	                  <input type="radio" name="question" value="professor">
-	                  Professor
-	                </label>
+	              <label class="label">Detailed Text</label>
+	              <div class="control has-icons-right">
+	                <input class="input {% if errordict['detailed'] %} is-danger {% endif %}" type="text" name="dtext" value="">
+	                <span class="icon is-small is-right">
+	                  <i class="fas fa-exclamation-triangle"></i>
+	                </span>
 	              </div>
+	              {% if errordict['detailed'] %}
+	                <p class="help is-danger">{{ errordict['detailed'] }}</p>
+	              {% endif %}
+	            </div>
+
+	            <div class="field">
+	              <label class="label">Video</label>
+	              <div class="control has-icons-right">
+	                <input class="input {% if errordict['video'] %} is-danger {% endif %}" type="file" name="video" accept="video/*">
+	                <span class="icon is-small is-right">
+	                  <i class="fas fa-exclamation-triangle"></i>
+	                </span>
+	              </div>
+	              {% if errordict['video'] %}
+	                <p class="help is-danger">{{ errordict['video'] }}</p>
+	              {% endif %}
 	            </div>
 
 	            <div class="field">
@@ -103,12 +116,9 @@
 	              </div>
 	            </div>
 
-	            <div class="field is-grouped">
+	            <div class="field">
 	              <div class="control">
-	                <button type="submit" name="register" class="button is-link">Register</button>
-	              </div>
-	              <div class="control">
-	                <button id="cancel" class="button is-link is-light">Cancel</button>
+	                <button type="submit" name="submit" class="button is-link">Submit</button>
 	              </div>
 	            </div>
 	          </form>
