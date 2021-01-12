@@ -1,8 +1,11 @@
 from flask import render_template, request, redirect, url_for, session
 import pymysql
+import base64
 
+# control variables --> unused currently but preferably can be used
 registering = False
 logging = False
+# dictionary that holds error texts
 errordict = {}
 
 def home_page():
@@ -13,7 +16,8 @@ def home_page():
 	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
 	try:
 		with con.cursor() as cur:
-			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE")
+			# for sign up form get department names
+			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE") 
 			result = cur.fetchone()
 			print(result, type(result))
 	finally:
@@ -36,7 +40,8 @@ def about_page():
 	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
 	try:
 		with con.cursor() as cur:
-			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE")
+			# for sign up form get department names
+			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE") 
 			result = cur.fetchone()
 			print(result, type(result))
 	finally:
@@ -49,7 +54,7 @@ def about_page():
 
 	return render_template("about.html",  registering=False, logging=False, errordict={}, departments=result)
 
-
+# function that handles validation of the login and register forms 
 def validate_login_register(form, loginFlag, dep):
 	errordict = {}
 	global logging
@@ -65,6 +70,7 @@ def validate_login_register(form, loginFlag, dep):
 			valid = False 
 			errordict['loginpassword'] = "password is not valid"
 		if not valid:
+			# if user enters inavlid info redirected to same page with error msgs
 			return render_template("home.html",  registering=registering, logging=True, errordict=errordict, departments=dep)
 		else:
 			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
@@ -92,6 +98,7 @@ def validate_login_register(form, loginFlag, dep):
 			logging = False
 			session["user"] = user
 			session["role"] = role
+			# if logged in succesfully redirect to home page
 			return render_template("home.html",  registering=False, logging=False, errordict={})
 	else:
 		valid = True
@@ -118,6 +125,7 @@ def validate_login_register(form, loginFlag, dep):
 			valid = False
 			errordict['regusername'] = "username is not valid"
 		if not valid:
+			# if user enters inavlid info redirected to same page with error msgs
 			return render_template("home.html",  registering=True, logging=logging, errordict=errordict, departments=dep)
 		else:
 			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
@@ -140,6 +148,7 @@ def validate_login_register(form, loginFlag, dep):
 			finally:
 				con.close()
 			print("registration successfull")
+			# if registered succesfully redirect to home page
 			return render_template("home.html",  registering=False, logging=False, errordict={})
 
 def user_page():
@@ -158,10 +167,12 @@ def add_project():
 		return validate_add_proj_form(request.form, result)
 	return render_template("add_project.html", errordict={}, departments=result)
 
+# logout function
 def logout():
 	session.pop("user", None)
 	return redirect(url_for('home_page'))
 
+# function that handles validation of the add project form
 def validate_add_proj_form(form, dep):
 	errordict = {}
 	title = form.get("title")
@@ -177,12 +188,9 @@ def validate_add_proj_form(form, dep):
 	file1 = request.files['img']
 	file2 = request.files['video']
 
-	#with open('photo.jpg', 'rb') as f:
-	#	data = f.read()
-	#data = pymysql.Binary(b"\x00\x01\x02")
+	# binary data of the photo and video
 	data1 = file1.read()
 	data2 = file2.read()
-	#print(data)
 
 	if title == "":
 		valid = False
@@ -203,18 +211,11 @@ def validate_add_proj_form(form, dep):
 
 	try:
 		with con.cursor() as cur:
-			#data = bytes(b'\x00\x01\x02')
 			sql1 = "SELECT ID FROM DEPARTMENT_TABLE WHERE NAME=" + "'" + department + "'"
 			cur.execute(sql1)
 			result = cur.fetchone()
-			#statement = "INSERT INTO PROJECT_TABLE(ID, TITLE, SUBJECT, STARTDATE, ENDDATE, PHOTO, NUMOFLIKES, SUMMARY, DETAILEDTEXT, VIDEO, DEPARTMENTID) VALUES (NULL, %s, %s, %s, %s, NULL, %d, %s, %s, NULL, %d)"
-			#sql = "INSERT INTO PROJECT_TABLE(ID, TITLE, SUBJECT, STARTDATE, ENDDATE, PHOTO, NUMOFLIKES, SUMMARY, DETAILEDTEXT, VIDEO, DEPARTMENTID) VALUES (NULL, '%s', '%s', '%s', '%s',_binary '%s', '%d', '%s', '%s', NULL, '%d')" % (title, subject, start_date, end_date, (bytes(b'\x00\x01\x02'),), 0, summary, detailed, result[0])
-			#tupp = (title, subject, start_date, end_date, 0, summary, detailed, result[0])
-			#sql = """INSERT INTO PROJECT_TABLE(ID, TITLE, SUBJECT, STARTDATE, ENDDATE, PHOTO, NUMOFLIKES, SUMMARY, DETAILEDTEXT, VIDEO, DEPARTMENTID) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?, ?, NULL, ?)""",(title, subject, start_date, end_date, data, 0, summary, detailed, result[0])
-			#cur.execute(sql)
-			#cur.execute("insert into test_blob (PHOTO) values (_binary %s)", (data1,))
+			# photo is inserted as binary large object file to database
 			cur.execute("INSERT INTO PROJECT_TABLE (ID, TITLE, SUBJECT, STARTDATE, ENDDATE, PHOTO, NUMOFLIKES, SUMMARY, DETAILEDTEXT, VIDEO, DEPARTMENTID) VALUES (NULL, %s, %s, %s, %s, _binary %s, 0, %s, %s, NULL, %s)", (title, subject, start_date, end_date, data1, summary, detailed, result[0]))
-			#cur.execute("INSERT INTO DENEME (ID, NAME) VALUES (1, %s)", ("emre"))
 			con.commit()
 	except pymysql.Error as e:
 		print("rolled back...", e)
@@ -226,6 +227,40 @@ def validate_add_proj_form(form, dep):
 	print("Project added successfully")
 
 	return redirect(url_for('add_project'))
+
+# function of the profile pages of the projects
+def project(prj_id):
+	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	try:
+		with con.cursor() as cur:
+			sql = "SELECT TITLE, SUBJECT, STARTDATE, ENDDATE, NUMOFLIKES, SUMMARY, DETAILEDTEXT, PHOTO FROM PROJECT_TABLE WHERE ID=" + "'" + prj_id + "'"
+			cur.execute(sql)
+			result = cur.fetchone()
+			# retrieve image to html with base64 encoding
+			encoded = base64.b64encode(result[7])
+			displayable = str(encoded)
+
+	finally:
+		con.close()
+	return render_template("project.html", title=result[0], subject=result[1], start_date=result[2], end_date=result[3], num_of_likes=result[4], summary=result[5], detailed=result[6], errordict={}, d=displayable[2:-1])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
