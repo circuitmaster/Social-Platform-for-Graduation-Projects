@@ -13,6 +13,7 @@ app.add_url_rule("/user", methods = ['GET', 'POST'], view_func=views.user_page)
 app.add_url_rule("/add_project", methods = ['GET', 'POST'], view_func=views.add_project)
 app.add_url_rule("/logout", view_func=views.logout)
 app.add_url_rule("/prj=<prj_id>", methods = ['GET', 'POST'], view_func=views.project)
+app.add_url_rule("/livesearch=<search_pattern>", methods = ['GET', 'POST'], view_func=views.livesearch)
 
 # custom not found page function
 @app.errorhandler(404)

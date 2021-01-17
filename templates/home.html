@@ -12,30 +12,66 @@
 				  </p>
 				  <div class="panel-block">
 				    <p class="control has-icons-left">
-				      <input class="input" type="text" placeholder="Search">
+				      <input class="input" id="livesearch" type="text" placeholder="Search">
 				      <span class="icon is-left">
 				        <i class="fas fa-search" aria-hidden="true"></i>
 				      </span>
 				    </p>
 				  </div>
 				  <p class="panel-tabs">
-				    <a class="is-active">All</a>
-				    <a>Project Name</a>
-				    <a>Contributors</a>
-				    <a>Year</a>
-				    <a>Department</a>
-				    <a>Faculty</a>
-				    <a>Subject</a>
+				    <a class="is-active" id="tab" name="all">All</a>
+				    <a id="tab" name="name">Project Name</a>
+				    <a id="tab" name="cont">Contributors</a>
+				    <a id="tab" name="year">Year</a>
+				    <a id="tab" name="dep">Department</a>
+				    <a id="tab" name="fac">Faculty</a>
+				    <a id="tab" name="sub">Subject</a>
 				  </p>
 				  <div class="panel-block">
 				    <button class="button is-link is-outlined is-fullwidth">
 				      Search
 				    </button>
 				  </div>
+				  <aside class="menu" id="datalist">
+				  	
+				  </aside>
 				</nav>
 	        </div>
 	      </div>
 	    </section>
     </div>
+
+    <script>
+    	var name = "all"
+    	$(document).ready(function(){
+    		$("#livesearch").on("input", function(e){
+    			text_search = $("#livesearch").val();
+    			$.ajax({
+    				method:"post",
+    				url:"/livesearch="+name,
+    				data:{text:text_search},
+    				success:function(res){
+    					var data = "<ul class='menu-list'>";
+    					$.each(res, function(index, value){
+    						data += `<li><a href=\"/prj=${value[0]}\">`
+    						
+    						data += value[1]
+    						data += "</a></li>"
+    						console.log(value[1] + value[0])
+    					});
+    					data += "</ul>";
+    					$("#datalist").html(data);
+    				}
+    			})
+    		});
+    		$("a[id='tab']").click(function(e){
+				$("a[class='is-active']").attr("class","")
+				$(e.target).attr("class","is-active")
+				name = $(e.target).attr("name")
+    		});
+    		
+    	})
+
+    </script>
    
 {% endblock %}
