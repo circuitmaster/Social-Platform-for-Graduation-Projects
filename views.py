@@ -62,6 +62,8 @@ def validate_login_register(form, loginFlag, dep):
 		valid = True
 		user = request.form.get("username")
 		password = request.form.get("password")
+		if request.form.get('remember'):
+			session.permanent = True
 		if user == "":
 			valid = False
 			errordict['loginuser'] = "username is not valid"
@@ -323,6 +325,7 @@ def add_project():
 def logout():
 	session.pop("user", None)
 	session.pop("role", None)
+	session.permanent = False
 	return redirect(url_for('home_page'))
 
 # function that handles validation of the add project form

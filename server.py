@@ -1,10 +1,12 @@
 from flask import Flask, request, render_template
+from datetime import timedelta
 import views
 
 app = Flask(__name__)
 # secret key for handling session
 app.secret_key = "123base321"
 app.config.from_object("settings")
+app.permanent_session_lifetime = timedelta(minutes=60)
 
 # url rules
 app.add_url_rule("/", methods = ['GET', 'POST'], view_func=views.home_page)

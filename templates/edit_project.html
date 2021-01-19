@@ -10,7 +10,7 @@
 	            <div class="field">
 	              <label class="label">Project Title</label>
 	              <div class="control">
-	                <input class="input {% if errordict['title'] %} is-danger {% endif %}" name="title" type="text" placeholder="">
+	                <input class="input {% if errordict['title'] %} is-danger {% endif %}" name="title" type="text" placeholder="Enter new Title">
 	                {% if errordict['title'] %}
 	                <p class="help is-danger">{{ errordict['title'] }}</p>
 	                {% endif %}
@@ -20,7 +20,7 @@
 	            <div class="field">
 	              <label class="label">Subject</label>
 	              <div class="control">
-	                <input class="input {% if errordict['subject'] %} is-danger {% endif %}" name="subject" type="text">
+	                <input class="input {% if errordict['subject'] %} is-danger {% endif %}" name="subject" type="text" placeholder="Enter new Subject">
 	                {% if errordict['subject'] %}
 	                <p class="help is-danger">{{ errordict['subject'] }}</p>
 	                {% endif %}
@@ -86,7 +86,7 @@
 	            <div class="field">
 	              <label class="label">Summary</label>
 	              <div class="control has-icons-right">
-	                <input class="input {% if errordict['summary'] %} is-danger {% endif %}" type="text" name="summary" value="">
+	                <input class="input {% if errordict['summary'] %} is-danger {% endif %}" type="text" name="summary" value="" placeholder="Enter new Summary">
 	                <span class="icon is-small is-right">
 	                  <i class="fas fa-exclamation-triangle"></i>
 	                </span>
@@ -99,7 +99,7 @@
 	            <div class="field">
 	              <label class="label">Text</label>
 	              <div class="control has-icons-right">
-	                <textarea class="textarea {% if errordict['detailed'] %} is-danger {% endif %}" name="dtext" placeholder=""></textarea>
+	                <textarea class="textarea {% if errordict['detailed'] %} is-danger {% endif %}" name="dtext" placeholder="Enter new Text"></textarea>
 	                <span class="icon is-small is-right">
 	                  <i class="fas fa-exclamation-triangle"></i>
 	                </span>
