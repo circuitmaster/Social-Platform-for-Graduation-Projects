@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}Projects for Me{% endblock %}
+{% block content %}
+<div class="search">
+	   <section class="hero">
+	      <div class="hero-body">
+	        <div class="container has-text-centered">
+	          <h1 class="title">Projects for You</h1>
+	          <p class="subtitle">If you entered your courses and grades you can find projects for your skills in this page. (Algorithm looks for lessons that you got A or B grade)</p>
+	          <div class="list">
+	          {% for p in projects %}
+	          <div class="list-item">
+	          <a href="/prj={{p[0]}}">{{p[1]}}</a>	
+				</div>
+	          {% endfor %}
+	      	</div>
+	        </div>
+	      </div>
+	    </section>
+</div>
+{% endblock %}

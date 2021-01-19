@@ -11,7 +11,7 @@
 	            <div class="field">
 	              <label class="label">Username</label>
 	              <div class="control">
-	                <input class="input {% if errordict['user'] %} is-danger {% endif %}" name="user" type="text" placeholder="">
+	                <input class="input {% if errordict['user'] %} is-danger {% endif %}" name="user" type="text" placeholder="Enter new Username">
 	                {% if errordict['user'] %}
 	                <p class="help is-danger">{{ errordict['user'] }}</p>
 	                {% endif %}
@@ -21,7 +21,7 @@
 	            <div class="field">
 	              <label class="label">Password</label>
 	              <div class="control">
-	                <input class="input {% if errordict['password'] %} is-danger {% endif %}" name="password" type="password">
+	                <input class="input {% if errordict['password'] %} is-danger {% endif %}" name="password" type="password" placeholder="Enter new Password">
 	                {% if errordict['password'] %}
 	                <p class="help is-danger">{{ errordict['password'] }}</p>
 	                {% endif %}
@@ -41,7 +41,7 @@
 	              {% endif %}
 	            </div>
 
-	            <div class="field">
+	            <div class="field {% if session['user'] != 'student' %} is-hidden {% endif %}">
 	              <label class="label">Number of Member Courses Taken</label>
 	              <div class="control" id="div1">
 	                <input class="input {% if errordict['noc'] %} is-danger {% endif %}" name="noc" id="noc" oninput="add_course()" type="number" min="0">

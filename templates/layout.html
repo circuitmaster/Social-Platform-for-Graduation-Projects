@@ -18,7 +18,7 @@
           <a class="navbar-item" href="{{ url_for('home_page') }}">
             <img src="{{ url_for('static', filename='book.png') }}" alt="site logo" style="max-height: 50px" class="py-2 px-2">
           </a>
-          <a class="navbar-item {% if session['role'] != 'student' or session['role'] == None %} is-hidden {% endif %}">Projects for My Interest</a>
+          <a class="navbar-item {% if session['role'] != 'student' or session['role'] == None %} is-hidden {% endif %}" href="{{ url_for('interest') }}">Projects for My Interest</a>
           <a class="navbar-item" href="{{ url_for('about_page') }}">About</a>
         </div>
         <div class="navbar-end">

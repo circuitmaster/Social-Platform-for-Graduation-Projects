@@ -164,6 +164,8 @@ def validate_login_register(form, loginFlag, dep):
 # function of the user page
 def user_page():
 	errordict = {}
+	if 'user' not in session.keys():
+		return redirect(url_for('home_page'))
 	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
 	try:
 		with con.cursor() as cur:
@@ -175,7 +177,7 @@ def user_page():
 			result = cur.fetchone()
 			displayable = None
 			# retrieve image to html with base64 encoding
-			if result[0] != None: 
+			if result != None and result[0] != None: 
 				encoded = base64.b64encode(result[0])
 				displayable = str(encoded)
 			#print(result, type(result))
@@ -186,13 +188,15 @@ def user_page():
 		new_username = request.form.get('user')
 		new_password = request.form.get('password')
 		email = request.form.get("email")
-		courses = request.form.getlist("course")
-		grades = request.form.getlist("grade")
+		if session['role'] == 'student':
+			courses = request.form.getlist("course")
+			grades = request.form.getlist("grade")
 		department = request.form['department']
 		file1 = request.files['img']
 
 		# binary data of the photo
 		data1 = file1.read()
+		print(data1)
 
 		valid = True
 
@@ -200,11 +204,11 @@ def user_page():
 			errordict['user'] = "new username is same as current username"
 			valid = False
 
-		if "@itu.edu.tr" not in email:
+		if "@itu.edu.tr" not in email and len(email) != 0:
 			errordict['regmail'] = "email is not valid"
 			valid = False
 
-		if len(courses) != 0:
+		if len(courses) != 0 and session['role'] == 'student':
 			for g in grades:
 				if g.lower() not in ["aa", "ba", "bb", "cb", "cc", "dc", "dd", "ff"]:
 					errordict['noc'] = "some of the grades are not valid"
@@ -218,7 +222,7 @@ def user_page():
 				return render_template("user.html", errordict=errordict, departments=deps, d=None)
 
 		con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
-
+		old_name = None
 		try:
 			with con.cursor() as cur:
 				sql = "SELECT ID FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
@@ -228,12 +232,14 @@ def user_page():
 				cur.execute(sqll)
 				resultt = cur.fetchone()
 				if len(new_username) != 0:
+					old_name = session['user']
 					control_sql = "SELECT ID FROM USER_TABLE WHERE USERNAME=" + "'" + new_username + "'"
 					cur.execute(control_sql)
 					ress = cur.fetchone()
 					if ress == None:	
 						sql1 = "UPDATE USER_TABLE SET USERNAME=" + "'" + new_username + "'" + " WHERE ID=" + "'" + str(result[0]) + "'"
 						cur.execute(sql1)
+						session['user'] = new_username
 					else:
 						errordict['user'] = "this username already exists"
 						if displayable != None:
@@ -247,36 +253,38 @@ def user_page():
 					sql1 = "UPDATE USER_TABLE SET EMAIL=" + "'" + email + "'" + " WHERE ID=" + "'" + str(result[0]) + "'"
 					cur.execute(sql1)
 				# add or update the profile photo
-				cur.execute("UPDATE USER_TABLE SET PHOTO= _binary %s WHERE ID= %s",(data1, result[0]))
+				if data1 != b'':
+					print("Not none")
+					cur.execute("UPDATE USER_TABLE SET PHOTO= _binary %s WHERE ID= %s",(data1, result[0]))
 				sql1 = "SELECT ID FROM DEPARTMENT_TABLE WHERE NAME=" + "'" + department + "'"
 				cur.execute(sql1)
 				result2 = cur.fetchone()
-				print(result2)
 				if result2 != None:
 					sqldep = "UPDATE USER_TABLE SET DEPARTMENTID=" + "'" + str(result2[0]) + "'" + " WHERE ID=" + "'" + str(result[0]) + "'"
 					cur.execute(sqldep)
-				i = 0
-				for c in courses:
-					print(c)
-					sql1 = "SELECT ID FROM COURSE_TABLE WHERE COURSENAME=" + "'" + c + "'"
-					cur.execute(sql1)
-					res = cur.fetchone()
-					print(res)
-					sql2 = "SELECT ID FROM COURSE_GRADE_TABLE WHERE STUDENTID=" + "'" + str(resultt[0]) + "'" + " AND COURSEID=" + "'" + str(res[0]) + "'"
-					cur.execute(sql2)
-					res2 = cur.fetchone()
-					if res2 == None:
-						sql3 = "INSERT INTO COURSE_GRADE_TABLE(ID, STUDENTID, COURSEID, GRADE) VALUES (NULL, '%d', '%d', '%s')" % (resultt[0], res[0], grades[i])
-						cur.execute(sql3)
-					else:
-						sql3 = "UPDATE COURSE_GRADE_TABLE SET GRADE=" + "'" + grades[i] + "'" + " WHERE ID=" + "'" + str(res2[0]) + "'"
-						cur.execute(sql3)
-					i += 1
+				if session['role'] == 'student':
+					i = 0
+					for c in courses:
+						print(c)
+						sql1 = "SELECT ID FROM COURSE_TABLE WHERE COURSENAME=" + "'" + c + "'"
+						cur.execute(sql1)
+						res = cur.fetchone()
+						sql2 = "SELECT ID FROM COURSE_GRADE_TABLE WHERE STUDENTID=" + "'" + str(resultt[0]) + "'" + " AND COURSEID=" + "'" + str(res[0]) + "'"
+						cur.execute(sql2)
+						res2 = cur.fetchone()
+						if res2 == None:
+							sql3 = "INSERT INTO COURSE_GRADE_TABLE(ID, STUDENTID, COURSEID, GRADE) VALUES (NULL, '%d', '%d', '%s')" % (resultt[0], res[0], grades[i])
+							cur.execute(sql3)
+						else:
+							sql3 = "UPDATE COURSE_GRADE_TABLE SET GRADE=" + "'" + grades[i] + "'" + " WHERE ID=" + "'" + str(res2[0]) + "'"
+							cur.execute(sql3)
+						i += 1
 				
 				con.commit()
-				session['user'] = new_username
 		except pymysql.Error as e:
 			print("rolled back...", e)
+			if old_name != None:
+				session['user'] = old_name
 			con.rollback()
 		finally:
 			con.close()
@@ -394,64 +402,117 @@ def validate_add_proj_form(form, dep):
 
 # function of the profile pages of the projects
 def project(prj_id):
-	print(prj_id)
+	if request.method == 'POST':
+		errordict = {}
+		comment = request.form.get('comment')
+
+		con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+		try:
+			with con.cursor() as cur:
+				sql = "SELECT ID FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
+				cur.execute(sql)
+				idd = cur.fetchone()
+				sql2 = "INSERT INTO COMMENT_TABLE(ID, PROJECTID, USER_ID, TEXT) VALUES (NULL, '%d', '%d', '%s')" % (int(prj_id), int(idd[0]), comment)
+				cur.execute(sql2)
+				con.commit()
+		finally:
+			con.close()
 	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	displayable = None
 	try:
 		with con.cursor() as cur:
+			sql0 = "SELECT PHOTO FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
+			cur.execute(sql0)
+			data = cur.fetchone()
 			sql = "SELECT TITLE, SUBJECT, STARTDATE, ENDDATE, NUMOFLIKES, SUMMARY, DETAILEDTEXT, PHOTO FROM PROJECT_TABLE WHERE ID=" + "'" + prj_id + "'"
 			cur.execute(sql)
 			result = cur.fetchone()
+			sql2 = "SELECT u.USERNAME, c.TEXT, u.PHOTO FROM USER_TABLE u INNER JOIN COMMENT_TABLE c ON c.USER_ID = u.ID WHERE c.PROJECTID=" + "'" + str(prj_id) + "'"
+			cur.execute(sql2)
+			result2 = cur.fetchall()
+			print(result2)
 			# retrieve image to html with base64 encoding
-			if result[7] != None: 
+			if result != None and result[7] != None: 
 				encoded = base64.b64encode(result[7])
 				displayable = str(encoded)
 
 	finally:
 		con.close()
 
-	return render_template("project.html", title=result[0], subject=result[1], start_date=result[2], end_date=result[3], num_of_likes=result[4], summary=result[5], detailed=result[6], errordict={}, d=displayable[2:-1])
+	if displayable != None:
+		return render_template("project.html", title=result[0], subject=result[1], start_date=result[2], end_date=result[3], num_of_likes=result[4], summary=result[5], detailed=result[6], errordict={}, d=displayable[2:-1], comments = result2, base64=base64, str=str, pp=data)
+	else:
+		return render_template("project.html", title=result[0], subject=result[1], start_date=result[2], end_date=result[3], num_of_likes=result[4], summary=result[5], detailed=result[6], errordict={}, d=None, comments = result2, base64=base64, str=str, pp=data)
+
 
 # function for livesearch
 def livesearch(search_pattern):
-	print(search_pattern)
 
 	seach_val = request.form.get("text")
 	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
 	try:
 		with con.cursor() as cur:
 			if search_pattern == "all":
-				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE TITLE LIKE '%s'" % seach_val
+				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE TITLE LIKE '%s'" % (seach_val+'%')
 				cur.execute(query)
 				result = cur.fetchall()
 			elif search_pattern == "name":
-				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE TITLE LIKE '%s'" % seach_val
+				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE TITLE LIKE '%s'" % (seach_val+'%')
 				cur.execute(query)
 				result = cur.fetchall()
 			elif search_pattern == "cont":
-				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE TITLE LIKE '%s'" % seach_val
-				cur.execute(query)
+				sql0 = "SELECT s.ID FROM STUDENT_TABLE s INNER JOIN USER_TABLE u ON s.USER_ID = u.ID WHERE u.USERNAME LIKE" + "'" + seach_val + "%'"
+				cur.execute(sql0)
+				res = cur.fetchone()
+				sql = "SELECT p.ID, p.TITLE FROM PROJECT_TABLE p INNER JOIN PROJECT_MEMBER_TABLE m ON m.PROJECTID = p.ID WHERE m.STUDENTID=" + "'" + str(res[0]) + "'"
+				cur.execute(sql)
 				result = cur.fetchall()
 			elif search_pattern == "year":
-				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE STARTDATE LIKE '%s'" % seach_val
+				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE STARTDATE LIKE '%s'" % (seach_val+'%')
 				cur.execute(query)
 				result = cur.fetchall()
 			elif search_pattern == "dep":
-				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE TITLE LIKE '%s'" % seach_val
+				query = "SELECT p.ID, p.TITLE FROM PROJECT_TABLE p INNER JOIN DEPARTMENT_TABLE d ON p.DEPARTMENTID = d.ID WHERE d.NAME LIKE" + "'" + seach_val + "%'"
 				cur.execute(query)
 				result = cur.fetchall()
 			elif search_pattern == "fac":
-				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE TITLE LIKE '%s'" % seach_val
-				cur.execute(query)
-				result = cur.fetchall()
+				sql = "SELECT ID FROM FACULTY_TABLE WHERE NAME LIKE" + "'" + seach_val + "%'" 
+				cur.execute(sql)
+				res = cur.fetchone()
+				result = None
+				if len(res) != 0:
+					sql2 = "SELECT p.ID, p.TITLE FROM PROJECT_TABLE p INNER JOIN DEPARTMENT_TABLE d ON d.ID = p.DEPARTMENTID WHERE d.FACULTYID=" + "'" + str(res[0]) + "'"
+					cur.execute(sql2)
+					result = cur.fetchall()
 			elif search_pattern == "sub":
-				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE SUBJECT LIKE '%s'" % seach_val
+				query = "SELECT ID, TITLE FROM PROJECT_TABLE WHERE SUBJECT LIKE '%s'" % (seach_val+'%')
 				cur.execute(query)
 				result = cur.fetchall()
-			
+	except:
+		print("error")
 	finally:
 		con.close()
 	return jsonify(result)
 
+def interest():
+	if 'role' not in session.keys() or session['role'] != 'student':
+		return redirect(url_for('home_page'))
+	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+
+	try:
+		with con.cursor() as cur:
+			sql0 = "SELECT s.ID FROM STUDENT_TABLE s INNER JOIN USER_TABLE u ON u.ID = s.USER_ID WHERE u.USERNAME=" + "'" + session['user'] + "'"
+			cur.execute(sql0)
+			res = cur.fetchone()
+			print(res)
+			sql = "SELECT p.ID, p.TITLE FROM COURSE_GRADE_TABLE c INNER JOIN COURSE_REQ_TABLE r ON r.COURSEID = c.COURSEID INNER JOIN PROJECT_TABLE p ON p.ID = r.PROJECTID WHERE c.STUDENTID=" + "'" + str(res[0]) + "'" + " AND ( c.GRADE=" + "'AA'" + " OR c.GRADE=" + "'BA'" + " OR c.GRADE=" + "'BB' )" 
+			cur.execute(sql)
+			result = cur.fetchall()
+			print(result)
+	finally:
+		con.close()
+
+	return render_template("interest.html", errordict={}, projects=result)
 
 
 

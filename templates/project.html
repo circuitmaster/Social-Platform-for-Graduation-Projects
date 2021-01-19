@@ -13,9 +13,56 @@
 				<p>{{summary}}</p>
 				<h4>Text</h4>
 				<p>{{detailed}}</p>
-				<h4>Likes: {{num_of_likes}}</h4>
+				<h4>Likes {{num_of_likes}}</h4>
+				<article class="media">
+					<figure class="media-left">
+						<p class="image is-64x64">
+							<img src="data:image/png;base64,{{ str(base64.b64encode(pp[0]))[2:-1] }}" alt="profile photo" width="64" height="64">
+						</p>
+					</figure>
+					<div class="media-content">
+						<form method="POST">
+						    <div class="field">
+						      <p class="control">
+						        <textarea class="textarea" name="comment" placeholder="Add a comment..."></textarea>
+						      </p>
+						    </div>
+						    <nav class="level">
+						      <div class="level-left">
+						        <div class="level-item">
+						          <button type="submit" name="submit" class="button is-link">Post Comment</button>
+						        </div>
+						      </div>
+						    </nav>
+					    </form>
+					</div>
+				</article>
 			</div>
 		</div>
+		{% for c in comments %}
+		<article class="media">
+			  <figure class="media-left">
+			    <p class="image is-64x64">
+			    {% if c[2] !=  None  %}
+			    	<img src="data:image/png;base64,{{ str(base64.b64encode(c[2]))[2:-1] }}" alt="profile photo" width="64" height="64">
+			    {% else %}
+			      <img src="https://bulma.io/images/placeholders/128x128.png">
+			    {% endif %}
+			    </p>
+			  </figure>
+			  <div class="media-content">
+			    <div class="content">
+			      <p>
+			        <strong>{{c[0]}}</strong>
+			        <br>
+			        {{c[1]}}
+			        <br>
+			        <small><a>Like</a> · <a>Reply</a> · 3 hrs</small>
+			      </p>
+			    </div>
+			   </div>
+		</article>
+		{% endfor %}
 	</section>
 </div>
 {% endblock %}
