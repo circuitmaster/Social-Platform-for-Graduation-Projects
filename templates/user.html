@@ -6,6 +6,8 @@
 	      <div class="hero-body">
 	        <div class="container has-text-centered">
 	          <img src="data:image/png;base64,{{ d }}" alt="profile photo" width="100" height="100">
+	          <label class="label">({{session['user']}}) {{name}} {{surname}}</label>
+	          <label class="label">{{email}}</label>
 	          <h3 class="title mb-6">Edit Your Datas</h3>
 	          <form method="post" enctype="multipart/form-data">
 	            <div class="field">
@@ -41,7 +43,7 @@
 	              {% endif %}
 	            </div>
 
-	            <div class="field {% if session['user'] != 'student' %} is-hidden {% endif %}">
+	            <div class="field {% if session['role'] != 'student' %} is-hidden {% endif %}">
 	              <label class="label">Number of Member Courses Taken</label>
 	              <div class="control" id="div1">
 	                <input class="input {% if errordict['noc'] %} is-danger {% endif %}" name="noc" id="noc" oninput="add_course()" type="number" min="0">
@@ -78,6 +80,14 @@
 	            <div class="field">
 	              <div class="control">
 	                <button type="submit" name="submit" class="button is-link">Update</button>
+	              </div>
+	            </div>
+	          </form>
+
+	          <form method="POST">
+	          	<div class="field">
+	              <div class="control">
+	                <button type="submit" name="delete" class="button is-danger">DELETE YOUR PROFILE</button>
 	              </div>
 	            </div>
 	          </form>

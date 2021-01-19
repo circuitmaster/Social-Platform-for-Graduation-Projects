@@ -17,7 +17,12 @@
 				<article class="media">
 					<figure class="media-left">
 						<p class="image is-64x64">
+							{% if pp != None and pp[0] != None %}
 							<img src="data:image/png;base64,{{ str(base64.b64encode(pp[0]))[2:-1] }}" alt="profile photo" width="64" height="64">
+							{% else %}
+							<img src="https://bulma.io/images/placeholders/128x128.png" width="64" height="64">
+							{% endif %}
+							
 						</p>
 					</figure>
 					<div class="media-content">

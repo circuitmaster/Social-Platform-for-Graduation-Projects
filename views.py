@@ -19,7 +19,6 @@ def home_page():
 			# for sign up form get department names
 			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE") 
 			result = cur.fetchall()
-			print(result, type(result))
 	finally:
 		con.close()
 	if request.method == 'POST': 
@@ -144,9 +143,7 @@ def validate_login_register(form, loginFlag, dep):
 					sql = "INSERT INTO USER_TABLE(ID, USERNAME, PASSWORD, NAME, SURNAME, EMAIL, PHOTO, ROLE, DEPARTMENTID) VALUES (NULL, '%s', '%s', '%s', '%s', '%s', NULL, '%s', '%d')" % (username, password, name, surname, email, role, result[0])
 					cur.execute(sql)
 					result2 = con.insert_id()
-					print(result2)
 					if role == "student":
-						print(role)
 						sql3 = "INSERT INTO STUDENT_TABLE(ID, USER_ID) VALUES (NULL, '%d')" % (result2)
 						cur.execute(sql3)
 					else:
@@ -172,7 +169,7 @@ def user_page():
 			# to change department we need department names
 			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE") 
 			deps = cur.fetchall()
-			sql = "SELECT PHOTO FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
+			sql = "SELECT PHOTO, EMAIL, NAME, SURNAME FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
 			cur.execute(sql)
 			result = cur.fetchone()
 			displayable = None
@@ -184,6 +181,16 @@ def user_page():
 	finally:
 		con.close()
 	if request.method == 'POST':
+		if 'delete' in request.form:
+			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+			try:
+				with con.cursor() as cur:
+					sql = "DELETE FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
+					cur.execute(sql)
+					con.commit()
+			finally:
+				con.close()
+			return redirect(url_for("logout"))
 		errordict = {}
 		new_username = request.form.get('user')
 		new_password = request.form.get('password')
@@ -196,7 +203,6 @@ def user_page():
 
 		# binary data of the photo
 		data1 = file1.read()
-		print(data1)
 
 		valid = True
 
@@ -208,7 +214,7 @@ def user_page():
 			errordict['regmail'] = "email is not valid"
 			valid = False
 
-		if len(courses) != 0 and session['role'] == 'student':
+		if session['role'] == 'student' and len(courses) != 0:
 			for g in grades:
 				if g.lower() not in ["aa", "ba", "bb", "cb", "cc", "dc", "dd", "ff"]:
 					errordict['noc'] = "some of the grades are not valid"
@@ -254,7 +260,6 @@ def user_page():
 					cur.execute(sql1)
 				# add or update the profile photo
 				if data1 != b'':
-					print("Not none")
 					cur.execute("UPDATE USER_TABLE SET PHOTO= _binary %s WHERE ID= %s",(data1, result[0]))
 				sql1 = "SELECT ID FROM DEPARTMENT_TABLE WHERE NAME=" + "'" + department + "'"
 				cur.execute(sql1)
@@ -265,7 +270,6 @@ def user_page():
 				if session['role'] == 'student':
 					i = 0
 					for c in courses:
-						print(c)
 						sql1 = "SELECT ID FROM COURSE_TABLE WHERE COURSENAME=" + "'" + c + "'"
 						cur.execute(sql1)
 						res = cur.fetchone()
@@ -296,20 +300,19 @@ def user_page():
 			return render_template("user.html", errordict={}, departments=deps, d=None)
 	
 	if displayable != None:
-		return render_template("user.html", errordict={}, departments=deps, d=displayable[2:-1])
+		return render_template("user.html", errordict={}, departments=deps, d=displayable[2:-1], email=result[1], name=result[2], surname=result[3])
 	else:
-		return render_template("user.html", errordict={}, departments=deps, d=None)
+		return render_template("user.html", errordict={}, departments=deps, d=None, email=result[1], name=result[2], surname=result[3])
 
 
 def add_project():
-	if ('role' not in session.keys()) or session['role'] != 'professor' and session['role'] != 'admin':
+	if ('role' not in session.keys()) or (session['role'] != 'professor' and session['role'] != 'admin'):
 		return redirect(url_for('home_page'))
 	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
 	try:
 		with con.cursor() as cur:
 			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE")
 			result = cur.fetchall()
-			print(result, type(result))
 	finally:
 		con.close()
 	if request.method == 'POST': 
@@ -376,7 +379,6 @@ def validate_add_proj_form(form, dep):
 			sql2 = "SELECT p.ID FROM USER_TABLE u INNER JOIN PROFESSOR_TABLE p ON p.USER_ID = u.ID WHERE u.USERNAME=" + "'" + session["user"] + "'"
 			cur.execute(sql2)
 			result3 = cur.fetchone()
-			print(result3)
 			sql3 = "INSERT INTO PROJECT_MANAGER_TABLE(ID, PROFESSORID, PROJECTID) VALUES (NULL, '%d', '%d')" % (result3[0], result2)
 			cur.execute(sql3)
 			for s in students:
@@ -403,6 +405,8 @@ def validate_add_proj_form(form, dep):
 # function of the profile pages of the projects
 def project(prj_id):
 	if request.method == 'POST':
+		if 'user' not in session.keys():
+			return redirect(url_for('project', prj_id=prj_id))
 		errordict = {}
 		comment = request.form.get('comment')
 
@@ -419,18 +423,19 @@ def project(prj_id):
 			con.close()
 	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
 	displayable = None
+	data = None
 	try:
 		with con.cursor() as cur:
-			sql0 = "SELECT PHOTO FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
-			cur.execute(sql0)
-			data = cur.fetchone()
+			if 'user' in session.keys():
+				sql0 = "SELECT PHOTO FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
+				cur.execute(sql0)
+				data = cur.fetchone()
 			sql = "SELECT TITLE, SUBJECT, STARTDATE, ENDDATE, NUMOFLIKES, SUMMARY, DETAILEDTEXT, PHOTO FROM PROJECT_TABLE WHERE ID=" + "'" + prj_id + "'"
 			cur.execute(sql)
 			result = cur.fetchone()
 			sql2 = "SELECT u.USERNAME, c.TEXT, u.PHOTO FROM USER_TABLE u INNER JOIN COMMENT_TABLE c ON c.USER_ID = u.ID WHERE c.PROJECTID=" + "'" + str(prj_id) + "'"
 			cur.execute(sql2)
 			result2 = cur.fetchall()
-			print(result2)
 			# retrieve image to html with base64 encoding
 			if result != None and result[7] != None: 
 				encoded = base64.b64encode(result[7])
@@ -504,18 +509,121 @@ def interest():
 			sql0 = "SELECT s.ID FROM STUDENT_TABLE s INNER JOIN USER_TABLE u ON u.ID = s.USER_ID WHERE u.USERNAME=" + "'" + session['user'] + "'"
 			cur.execute(sql0)
 			res = cur.fetchone()
-			print(res)
 			sql = "SELECT p.ID, p.TITLE FROM COURSE_GRADE_TABLE c INNER JOIN COURSE_REQ_TABLE r ON r.COURSEID = c.COURSEID INNER JOIN PROJECT_TABLE p ON p.ID = r.PROJECTID WHERE c.STUDENTID=" + "'" + str(res[0]) + "'" + " AND ( c.GRADE=" + "'AA'" + " OR c.GRADE=" + "'BA'" + " OR c.GRADE=" + "'BB' )" 
 			cur.execute(sql)
 			result = cur.fetchall()
-			print(result)
+			result = tuple(set(result))
 	finally:
 		con.close()
 
 	return render_template("interest.html", errordict={}, projects=result)
 
 
+def my_projects():
+	if 'role' not in session.keys() or session['role'] != 'professor':
+		return redirect(url_for("home_page"))
+	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	try:
+		with con.cursor() as cur:
+			#sql0 = "SELECT p.ID FROM PROFESSOR_TABLE p INNER JOIN USER_TABLE u ON p.USER_ID = u.ID"
+			sql = "SELECT p.ID, p.TITLE FROM PROJECT_TABLE p INNER JOIN PROJECT_MANAGER_TABLE m ON p.ID = m.PROJECTID INNER JOIN PROFESSOR_TABLE t ON t.ID = m.PROFESSORID INNER JOIN USER_TABLE u ON u.ID = t.USER_ID WHERE u.USERNAME=" + "'" + session['user'] + "'"
+			cur.execute(sql)
+			result = cur.fetchall()
+	finally:
+		con.close()
+	return render_template("my_projects.html", errordict={}, projects=result)
 
+def edit_project(prj_id):
+	if 'role' not in session.keys() or session['role'] != 'professor':
+		return redirect(url_for("home_page"))
+	errordict = {}
+	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	try:
+		with con.cursor() as cur:
+			# to change department we need department names
+			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE") 
+			dep = cur.fetchall()
+	finally:
+		con.close()
+	if request.method == 'POST':
+		if 'delete' in request.form:
+			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+			try:
+				with con.cursor() as cur:
+					sql = "DELETE FROM PROJECT_TABLE WHERE ID=" + "'" + prj_id + "'"
+					cur.execute(sql)
+					con.commit()
+			finally:
+				con.close()
+			return redirect(url_for("my_projects"))
+		new_title = request.form.get("title")
+		new_subject = request.form.get("subject")
+		new_start_date = request.form.get("date1")
+		new_end_date = request.form.get("date2")
+		new_summary = request.form.get("summary")
+		new_detailed = request.form.get("dtext")
+
+		new_students = request.form.getlist("contributer")
+		new_reqs = request.form.getlist("prerequisite")
+		new_department = request.form['department']
+
+		file1 = request.files['img']
+		file2 = request.files['video']
+
+		# binary data of the photo and video
+		data1 = file1.read()
+		data2 = file2.read()
+
+		con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+		try:
+			with con.cursor() as cur:
+				if len(new_title) != 0:
+					sql = "UPDATE PROJECT_TABLE SET TITLE=" + "'" + new_title + "'" + " WHERE ID=" + "'" + str(prj_id) + "'"
+					cur.execute(sql)
+				if len(new_subject) != 0:
+					sql = "UPDATE PROJECT_TABLE SET SUBJECT=" + "'" + new_subject + "'" + " WHERE ID=" + "'" + str(prj_id) + "'"
+					cur.execute(sql)
+				if len(new_start_date) != 0:
+					sql = "UPDATE PROJECT_TABLE SET STARTDATE=" + "'" + new_start_date + "'" + " WHERE ID=" + "'" + str(prj_id) + "'"
+					cur.execute(sql)
+				if len(new_end_date) != 0:
+					sql = "UPDATE PROJECT_TABLE SET ENDDATE=" + "'" + new_start_date + "'" + " WHERE ID=" + "'" + str(prj_id) + "'"
+					cur.execute(sql)
+				if len(new_summary) != 0:
+					sql = "UPDATE PROJECT_TABLE SET SUMMARY=" + "'" + new_summary + "'" + " WHERE ID=" + "'" + str(prj_id) + "'"
+					cur.execute(sql)
+				if len(new_detailed) != 0:
+					sql = "UPDATE PROJECT_TABLE SET DETAILEDTEXT=" + "'" + new_detailed + "'" + " WHERE ID=" + "'" + str(prj_id) + "'"
+					cur.execute(sql)
+				sql1 = "SELECT ID FROM DEPARTMENT_TABLE WHERE NAME=" + "'" + new_department + "'"
+				cur.execute(sql1)
+				result2 = cur.fetchone()
+				if result2 != None:
+					sqldep = "UPDATE PROJECT_TABLE SET DEPARTMENTID=" + "'" + str(result2[0]) + "'" + " WHERE ID=" + "'" + str(prj_id) + "'"
+					cur.execute(sqldep)
+				if len(new_students) != 0:
+					query = "DELETE FROM PROJECT_MEMBER_TABLE WHERE PROJECTID=" + "'" + prj_id + "'"
+					cur.execute(query)
+					for s in new_students:
+						sql4 = "INSERT INTO PROJECT_MEMBER_TABLE(ID, STUDENTID, PROJECTID) VALUES (NULL, '%d', '%d')" % (int(s), int(prj_id))
+						cur.execute(sql4)
+				if len(new_reqs) != 0:
+					query = "DELETE FROM COURSE_REQ_TABLE WHERE PROJECTID=" + "'" + prj_id + "'"
+					cur.execute(query)
+					for c in new_reqs:
+						sql5 = "SELECT ID FROM COURSE_TABLE WHERE COURSENAME=" + "'" + c + "'"
+						cur.execute(sql5)
+						res = cur.fetchone()
+						sql6 = "INSERT INTO COURSE_REQ_TABLE(ID, PROJECTID, COURSEID) VALUES (NULL, '%d', '%d')" % (int(prj_id), res[0])
+						cur.execute(sql6)
+				if data1 != b'':
+					cur.execute("UPDATE PROJECT_TABLE SET PHOTO= _binary %s WHERE ID= %s",(data1, prj_id))
+				con.commit()
+		except pymysql.Error as e:
+			print(e)
+		finally:
+			con.close()
+	return render_template("edit_project.html", errordict={}, departments=dep)
 
 
 

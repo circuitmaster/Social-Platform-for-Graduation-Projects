@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block title %}My Projects{% endblock %}
+{% block content %}
+	<div class="search">
+	   <section class="hero">
+	      <div class="hero-body">
+	        <div class="container has-text-centered">
+	          <h1 class="title">My Projects</h1>
+	          <p class="subtitle">You can edit and delete your projects here.</p>
+	       		<div class="list">
+	       			{% for p in projects %}
+	       			<div class="list-item">
+	       				<a href="/edit_prj={{p[0]}}">{{p[1]}}</a>
+	       			</div>
+	       			{% endfor %}
+	       		</div>
+	        </div>
+	      </div>
+	    </section>
+    </div>
+   
+{% endblock %}
