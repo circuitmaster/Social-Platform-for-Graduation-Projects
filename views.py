@@ -171,9 +171,17 @@ def user_page():
 			# to change department we need department names
 			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE") 
 			deps = cur.fetchall()
-			sql = "SELECT PHOTO, EMAIL, NAME, SURNAME FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
+			sql = "SELECT PHOTO, EMAIL, NAME, SURNAME, ID FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
 			cur.execute(sql)
 			result = cur.fetchone()
+			sttd2 = None
+			#if session['role'] == 'student':
+			#	sql2 = "SELECT ID FROM STUDENT_TABLE WHERE USER_ID=" + "'" + str(result[4]) + "'"
+			#	cur.execute(sql2)
+			#	sttd = cur.fetchone()
+			#	sql3 = "SELECT c.COURSENAME, g.GRADE FROM COURSE_TABLE c INNER JOIN COURSE_GRADE_TABLE g ON c.ID = g.COURSEID WHERE STUDENTID=" + "'" + str(sttd[0]) + "'"
+			#	cur.execute(sql3)
+			#	sttd2 = cur.fetchall()
 			displayable = None
 			# retrieve image to html with base64 encoding
 			if result != None and result[0] != None: 
