@@ -13,7 +13,7 @@ def home_page():
 	global logging
 	logging = False
 	registering = False
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 	try:
 		with con.cursor() as cur:
 			# for sign up form get department names
@@ -36,7 +36,7 @@ def about_page():
 	global logging
 	logging = False
 	registering = False
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 	try:
 		with con.cursor() as cur:
 			# for sign up form get department names
@@ -74,7 +74,7 @@ def validate_login_register(form, loginFlag, dep):
 			# if user enters inavlid info redirected to same page with error msgs
 			return render_template("home.html",  registering=registering, logging=True, errordict=errordict, departments=dep)
 		else:
-			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+			con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 			try:
 
 				with con.cursor() as cur:
@@ -130,7 +130,7 @@ def validate_login_register(form, loginFlag, dep):
 			# if user enters inavlid info redirected to same page with error msgs
 			return render_template("home.html",  registering=True, logging=logging, errordict=errordict, departments=dep)
 		else:
-			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+			con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 
 			try:
 				with con.cursor() as cur:
@@ -165,7 +165,7 @@ def user_page():
 	errordict = {}
 	if 'user' not in session.keys():
 		return redirect(url_for('home_page'))
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 	try:
 		with con.cursor() as cur:
 			# to change department we need department names
@@ -192,7 +192,7 @@ def user_page():
 		con.close()
 	if request.method == 'POST':
 		if 'delete' in request.form:
-			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+			con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 			try:
 				with con.cursor() as cur:
 					sql = "DELETE FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
@@ -237,7 +237,7 @@ def user_page():
 			else:
 				return render_template("user.html", errordict=errordict, departments=deps, d=None)
 
-		con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+		con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 		old_name = None
 		try:
 			with con.cursor() as cur:
@@ -318,7 +318,7 @@ def user_page():
 def add_project():
 	if ('role' not in session.keys()) or (session['role'] != 'professor' and session['role'] != 'admin'):
 		return redirect(url_for('home_page'))
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 	try:
 		with con.cursor() as cur:
 			cur.execute("SELECT NAME FROM DEPARTMENT_TABLE")
@@ -377,7 +377,7 @@ def validate_add_proj_form(form, dep):
 	if not valid:
 		return render_template("add_project.html", errordict=errordict, departments=dep)
 
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 
 	try:
 		with con.cursor() as cur:
@@ -421,7 +421,7 @@ def project(prj_id):
 		errordict = {}
 		comment = request.form.get('comment')
 
-		con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+		con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 		try:
 			with con.cursor() as cur:
 				sql = "SELECT ID FROM USER_TABLE WHERE USERNAME=" + "'" + session['user'] + "'"
@@ -432,7 +432,7 @@ def project(prj_id):
 				con.commit()
 		finally:
 			con.close()
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 	displayable = None
 	data = None
 	try:
@@ -465,7 +465,7 @@ def project(prj_id):
 def livesearch(search_pattern):
 
 	seach_val = request.form.get("text")
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 	try:
 		with con.cursor() as cur:
 			if search_pattern == "all":
@@ -513,7 +513,7 @@ def livesearch(search_pattern):
 def interest():
 	if 'role' not in session.keys() or session['role'] != 'student':
 		return redirect(url_for('home_page'))
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 
 	try:
 		with con.cursor() as cur:
@@ -533,7 +533,7 @@ def interest():
 def my_projects():
 	if 'role' not in session.keys() or session['role'] != 'professor':
 		return redirect(url_for("home_page"))
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 	try:
 		with con.cursor() as cur:
 			#sql0 = "SELECT p.ID FROM PROFESSOR_TABLE p INNER JOIN USER_TABLE u ON p.USER_ID = u.ID"
@@ -548,7 +548,7 @@ def edit_project(prj_id):
 	if 'role' not in session.keys() or session['role'] != 'professor':
 		return redirect(url_for("home_page"))
 	errordict = {}
-	con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+	con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 	try:
 		with con.cursor() as cur:
 			# to change department we need department names
@@ -558,7 +558,7 @@ def edit_project(prj_id):
 		con.close()
 	if request.method == 'POST':
 		if 'delete' in request.form:
-			con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+			con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 			try:
 				with con.cursor() as cur:
 					sql = "DELETE FROM PROJECT_TABLE WHERE ID=" + "'" + prj_id + "'"
@@ -585,7 +585,7 @@ def edit_project(prj_id):
 		data1 = file1.read()
 		data2 = file2.read()
 
-		con = pymysql.connect('localhost', 'root', 'graddbase123!', 'SPFGP')
+		con = pymysql.connect('localhost', 'root', '', 'SPFGP')
 		try:
 			with con.cursor() as cur:
 				if len(new_title) != 0:
