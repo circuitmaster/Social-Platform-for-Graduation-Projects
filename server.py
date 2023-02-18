@@ -4,7 +4,7 @@ import views
 
 app = Flask(__name__)
 # secret key for handling session
-app.secret_key = "123base321"
+app.secret_key = ""
 app.config.from_object("settings")
 app.permanent_session_lifetime = timedelta(minutes=60)
 
